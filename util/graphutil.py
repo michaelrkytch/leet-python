@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 from typing import Tuple, Any, List, Dict
 
 
@@ -47,3 +47,21 @@ def topo_sort(edges: List[Tuple[Any, Any]]) -> List[Any]:
         return path
     else:
         return None
+
+
+# Traverse graph from the given root breadth-first.
+# Produces the (lazy) sequence of nodes visited
+# childrenfn [v graph] returns the neihbors of v in graph
+# Graph representation can be anything that supports childrenfn
+def bfs(graph, childrenfn, root) -> List:
+    visitqueue = deque()
+    visitqueue.append(root) # Not using constructor b/c that seems to flatten collections
+    visited = {root}
+
+    while visitqueue:
+        yield (node := visitqueue.popleft())
+        # Put neighbors on the queue to visit later
+        for v in childrenfn(node, graph):
+            if v not in visited:
+                visited.add(v)
+                visitqueue.append(v)
